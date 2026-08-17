@@ -16,6 +16,9 @@
 #include <optional>
 #include <set>
 
+#define out(...) cout << "\x1b[93m" << __VA_ARGS__ << "\x1b[0m"
+#define outl(...) out(__VA_ARGS__) << endl
+
 using namespace std;
 
 namespace eager_search {
@@ -100,6 +103,7 @@ void EagerSearch::initialize() {
         SearchNode node = search_space.get_node(initial_state);
         node.open_initial();
 
+        outl("insert (init, " << initial_state.get_id() << ")");
         open_list->insert(eval_context, initial_state.get_id());
     }
 
@@ -115,12 +119,15 @@ void EagerSearch::print_statistics() const {
 }
 
 SearchStatus EagerSearch::step() {
+    outl("--- STEP ---");
+
     optional<SearchNode> node;
     while (true) {
         if (open_list->empty()) {
             log << "Completely explored state space -- no solution!" << endl;
             return FAILED;
         }
+        outl("remove_min");
         StateID id = open_list->remove_min();
         State s = state_registry.lookup_state(id);
         node.emplace(search_space.get_node(s));
@@ -162,6 +169,7 @@ SearchStatus EagerSearch::step() {
                     continue;
                 }
                 if (new_h != old_h) {
+                    outl("insert (lazy? " << id << ")");
                     open_list->insert(eval_context, id);
                     continue;
                 }
@@ -196,6 +204,9 @@ SearchStatus EagerSearch::step() {
                                     preferred_operator_evaluator.get(),
                                     preferred_operators);
     }
+
+    outl("notify_new_expansion " << s.get_id());
+    open_list->notify_new_expansion(s.get_id());
 
     for (OperatorID op_id : applicable_ops) {
         OperatorProxy op = task_proxy.get_operators()[op_id];
@@ -238,6 +249,7 @@ SearchStatus EagerSearch::step() {
             }
             succ_node.open_new_node(*node, op, get_adjusted_cost(op));
 
+            outl("insert (new, " << succ_state.get_id() << ")");
             open_list->insert(succ_eval_context, succ_state.get_id());
             if (search_progress.check_progress(succ_eval_context)) {
                 statistics.print_checkpoint_line(succ_node.get_g());
@@ -250,6 +262,7 @@ SearchStatus EagerSearch::step() {
                     *node, op, get_adjusted_cost(op));
                 EvaluationContext succ_eval_context(
                     succ_state, succ_node.get_g(), is_preferred, &statistics);
+                outl("insert (cheaper, " << succ_state.get_id() << ")");
                 open_list->insert(succ_eval_context, succ_state.get_id());
             } else if (succ_node.is_closed() && reopen_closed_nodes) {
                 /*
@@ -263,6 +276,7 @@ SearchStatus EagerSearch::step() {
                 succ_node.reopen_closed_node(*node, op, get_adjusted_cost(op));
                 EvaluationContext succ_eval_context(
                     succ_state, succ_node.get_g(), is_preferred, &statistics);
+                outl("insert (cheaper, reopen, " << succ_state.get_id() << ")");
                 open_list->insert(succ_eval_context, succ_state.get_id());
             } else {
                 /*

@@ -38,6 +38,7 @@ public:
         EvaluationContext &eval_context) const override;
     virtual bool is_reliable_dead_end(
         EvaluationContext &eval_context) const override;
+    void notify_new_expansion(const Entry& parent_entry) override;
 };
 
 
@@ -124,6 +125,14 @@ bool AlternationOpenList<Entry>::is_reliable_dead_end(
         if (sublist->is_reliable_dead_end(eval_context))
             return true;
     return false;
+}
+
+template <class Entry>
+void AlternationOpenList<Entry>::notify_new_expansion(const Entry& parent_entry)
+{
+    for (auto &list : open_lists) {
+        list->notify_new_expansion(parent_entry);
+    }
 }
 
 

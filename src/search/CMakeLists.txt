@@ -202,6 +202,20 @@ create_fast_downward_library(
 )
 
 create_fast_downward_library(
+        NAME heuristic_improvement_open_list
+        HELP "Heuristic improvement open list"
+        SOURCES
+        open_lists/heuristic_improvement_open_list
+)
+
+create_fast_downward_library(
+        NAME lw_open_list
+        HELP "Low-water mark open list"
+        SOURCES
+        open_lists/lw_open_list
+)
+
+create_fast_downward_library(
     NAME dynamic_bitset
     HELP "Poor man's version of boost::dynamic_bitset"
     SOURCES
@@ -338,6 +352,15 @@ create_fast_downward_library(
     SOURCES
         evaluators/weighted_evaluator
     DEPENDS
+        evaluators_subcategory
+)
+
+create_fast_downward_library(
+        NAME progress_evaluator
+        HELP "The progress evaluator"
+        SOURCES
+        evaluators/progress_evaluator
+        DEPENDS
         evaluators_subcategory
 )
 

@@ -1,0 +1,25 @@
+(define (domain test)
+  (:predicates
+    (ticket)
+    (start)
+    (a1) (a2)
+    (c1) (c2) (c3)
+    (b1) (b2) (b3) (b4)
+    (end)
+  )
+
+  (:action start-a1 :parameters () :precondition (start) :effect (and (not (start)) (a1) (not (ticket))))
+  (:action a1-a2 :parameters () :precondition (a1) :effect (and (not (a1)) (a2) (ticket)))
+  (:action a2-end :parameters () :precondition (a2) :effect (and (not (a2)) (not (ticket)) (end)))
+
+  (:action start-b1 :parameters () :precondition (start) :effect (and (not (start)) (b1)))
+  (:action b1-b2 :parameters () :precondition (b1) :effect (and (not (b1)) (b2)))
+  (:action b2-b3 :parameters () :precondition (b2) :effect (and (not (b2)) (b3)))
+  (:action b3-b4 :parameters () :precondition (b3) :effect (and (not (b3)) (b4)))
+  (:action b4-end :parameters () :precondition (b4) :effect (and (not (b4)) (end)))
+
+  (:action start-c1 :parameters () :precondition (start) :effect (and (not (start)) (c1)))
+  (:action c1-c2 :parameters () :precondition (c1) :effect (and (not (c1)) (c2)))
+  (:action c2-c3 :parameters () :precondition (c2) :effect (and (not (c2)) (c3)))
+  (:action c3-end :parameters () :precondition (c3) :effect (and (not (c3)) (end)))
+)

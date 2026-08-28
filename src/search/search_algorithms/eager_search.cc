@@ -16,8 +16,9 @@
 #include <optional>
 #include <set>
 
-#define out(...) cout << "\x1b[93m" << __VA_ARGS__ << "\x1b[0m"
-#define outl(...) out(__VA_ARGS__) << endl
+#define OUT_STYLE "\x1b[93m"
+#define OUT_PREFIX "[es] "
+#include "../../out.h"
 
 using namespace std;
 
@@ -45,6 +46,8 @@ EagerSearch::EagerSearch(
 }
 
 void EagerSearch::initialize() {
+    outl("init");
+
     log << "Conducting best first search"
         << (reopen_closed_nodes ? " with" : " without")
         << " reopening closed nodes, (real) bound = " << bound
@@ -103,7 +106,6 @@ void EagerSearch::initialize() {
         SearchNode node = search_space.get_node(initial_state);
         node.open_initial();
 
-        outl("insert (init, " << initial_state.get_id() << ")");
         open_list->insert(eval_context, initial_state.get_id());
     }
 
@@ -119,21 +121,21 @@ void EagerSearch::print_statistics() const {
 }
 
 SearchStatus EagerSearch::step() {
-    outl("--- STEP ---");
-
     optional<SearchNode> node;
     while (true) {
         if (open_list->empty()) {
             log << "Completely explored state space -- no solution!" << endl;
             return FAILED;
         }
-        outl("remove_min");
         StateID id = open_list->remove_min();
         State s = state_registry.lookup_state(id);
         node.emplace(search_space.get_node(s));
+        outl("pop " << id << " g=" << node->get_g());
 
-        if (node->is_closed())
+        if (node->is_closed()) {
+            outl("closed, next");
             continue;
+        }
 
         /*
           We can pass calculate_preferred=false here since preferred
@@ -169,7 +171,6 @@ SearchStatus EagerSearch::step() {
                     continue;
                 }
                 if (new_h != old_h) {
-                    outl("insert (lazy? " << id << ")");
                     open_list->insert(eval_context, id);
                     continue;
                 }
@@ -205,7 +206,6 @@ SearchStatus EagerSearch::step() {
                                     preferred_operators);
     }
 
-    outl("notify_new_expansion " << s.get_id());
     open_list->notify_new_expansion(s.get_id());
 
     for (OperatorID op_id : applicable_ops) {
@@ -224,8 +224,10 @@ SearchStatus EagerSearch::step() {
         }
 
         // Previously encountered dead end. Don't re-evaluate.
-        if (succ_node.is_dead_end())
+        if (succ_node.is_dead_end()) {
+            outl("previously encountered dead end " << succ_state.get_id());
             continue;
+        }
 
         if (succ_node.is_new()) {
             /*
@@ -242,14 +244,17 @@ SearchStatus EagerSearch::step() {
                 succ_state, succ_g, is_preferred, &statistics);
             statistics.inc_evaluated_states();
 
+            // outl("check dead end (triggers evaluation)");
             if (open_list->is_dead_end(succ_eval_context)) {
+                outl("skipping dead end successor " << succ_state.get_id());
                 succ_node.mark_as_dead_end();
                 statistics.inc_dead_ends();
                 continue;
             }
+
             succ_node.open_new_node(*node, op, get_adjusted_cost(op));
 
-            outl("insert (new, " << succ_state.get_id() << ")");
+            outl("queue successor " << succ_state.get_id());
             open_list->insert(succ_eval_context, succ_state.get_id());
             if (search_progress.check_progress(succ_eval_context)) {
                 statistics.print_checkpoint_line(succ_node.get_g());
@@ -262,7 +267,6 @@ SearchStatus EagerSearch::step() {
                     *node, op, get_adjusted_cost(op));
                 EvaluationContext succ_eval_context(
                     succ_state, succ_node.get_g(), is_preferred, &statistics);
-                outl("insert (cheaper, " << succ_state.get_id() << ")");
                 open_list->insert(succ_eval_context, succ_state.get_id());
             } else if (succ_node.is_closed() && reopen_closed_nodes) {
                 /*
@@ -276,7 +280,6 @@ SearchStatus EagerSearch::step() {
                 succ_node.reopen_closed_node(*node, op, get_adjusted_cost(op));
                 EvaluationContext succ_eval_context(
                     succ_state, succ_node.get_g(), is_preferred, &statistics);
-                outl("insert (cheaper, reopen, " << succ_state.get_id() << ")");
                 open_list->insert(succ_eval_context, succ_state.get_id());
             } else {
                 /*

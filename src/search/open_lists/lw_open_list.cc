@@ -16,8 +16,9 @@
 #include <optional>
 #include <unordered_map>
 
-#define out(...) std::cout << "\x1b[94m[LW] " << __VA_ARGS__ << "\x1b[0m"
-#define outl(...) out(__VA_ARGS__) << std::endl
+#define OUT_STYLE "\x1b[94m"
+#define OUT_PREFIX "lwol "
+#include "../../out.h"
 
 namespace lw_open_list {
 template <class Entry>
@@ -174,7 +175,7 @@ protected:
     }
 
 public:
-    LWOpenListFeature() : TypedFeature("lw")
+    LWOpenListFeature() : TypedFeature("lw_list")
     {
         document_title("Low-water mark open list");
         document_synopsis("");

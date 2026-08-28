@@ -17,8 +17,9 @@
 #include <unordered_map>
 #include <vector>
 
-#define out(...) cout << "\x1b[96m[HI] " << __VA_ARGS__ << "\x1b[0m"
-#define outl(...) out(__VA_ARGS__) << endl
+#define OUT_STYLE "\x1b[96m"
+#define OUT_PREFIX "hiol "
+#include "../../out.h"
 
 using namespace std;
 
@@ -270,7 +271,7 @@ protected:
     }
 
 public:
-    HeuristicImprovementOpenListFeature() : TypedFeature("hi")
+    HeuristicImprovementOpenListFeature() : TypedFeature("hi_list")
     {
         document_title("Heuristic improvement open list");
         document_synopsis("");

@@ -1,0 +1,5 @@
+(define (problem test-1)
+	(:domain redirect)
+	(:init (start) (key))
+	(:goal (and (key) (or (fake1) (fake3) (real3))))
+)

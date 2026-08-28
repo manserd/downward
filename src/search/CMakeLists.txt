@@ -365,6 +365,24 @@ create_fast_downward_library(
 )
 
 create_fast_downward_library(
+        NAME hi_evaluator
+        HELP "The HI evaluator"
+        SOURCES
+        evaluators/hi_evaluator
+        DEPENDS
+        evaluators_subcategory
+)
+
+create_fast_downward_library(
+        NAME lw_evaluator
+        HELP "The LW evaluator"
+        SOURCES
+        evaluators/lw_evaluator
+        DEPENDS
+        evaluators_subcategory
+)
+
+create_fast_downward_library(
     NAME sum_evaluator
     HELP "The sum evaluator"
     SOURCES

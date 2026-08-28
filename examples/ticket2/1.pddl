@@ -1,0 +1,5 @@
+(define (problem test-1)
+  (:domain test)
+  (:init (start) (ticket))
+  (:goal (and (end) (ticket)))
+)

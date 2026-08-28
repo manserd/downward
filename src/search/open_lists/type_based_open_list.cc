@@ -15,6 +15,10 @@
 #include <unordered_map>
 #include <vector>
 
+#define OUT_STYLE "\x1b[91m"
+#define OUT_PREFIX "tbol "
+#include "../../out.h"
+
 using namespace std;
 
 namespace type_based_open_list {
@@ -70,8 +74,9 @@ void TypeBasedOpenList<Entry>::do_insertion(
 template<class Entry>
 TypeBasedOpenList<Entry>::TypeBasedOpenList(
     const vector<shared_ptr<Evaluator>> &evaluators, int random_seed)
-    : evaluators(evaluators),
-      rng(utils::get_rng(random_seed)) {
+    : evaluators(evaluators) {
+    rng = utils::get_rng(random_seed);
+    outl("seed=" << random_seed);
 }
 
 template<class Entry>
@@ -79,6 +84,7 @@ Entry TypeBasedOpenList<Entry>::remove_min() {
     size_t bucket_id = rng->random(keys_and_buckets.size());
     auto &key_and_bucket = keys_and_buckets[bucket_id];
     const Key &min_key = key_and_bucket.first;
+    outl("from type " << min_key << " (index " << bucket_id << "/" << keys_and_buckets.size() << ")");
     Bucket &bucket = key_and_bucket.second;
     int pos = rng->random(bucket.size());
     Entry result = utils::swap_and_pop_from_vector(bucket, pos);

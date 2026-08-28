@@ -3,8 +3,11 @@ __pycache__/
 /sas_plan
 /sas_plan.*
 /builds/
+/builds_windows/
+/builds_macos/
 /misc/.tox/
 /misc/autodoc/downward-xmlrpc.secret
 
 /.idea/
-/run.cmd
+/validate.exe
+/validate

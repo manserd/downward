@@ -10,6 +10,10 @@
 #include <deque>
 #include <map>
 
+#define OUT_STYLE "\x1b[96m"
+#define OUT_PREFIX "bfol "
+#include "../../out.h"
+
 using namespace std;
 
 namespace standard_scalar_open_list {
@@ -60,6 +64,7 @@ Entry BestFirstOpenList<Entry>::remove_min() {
     assert(size > 0);
     auto it = buckets.begin();
     assert(it != buckets.end());
+    outl("h=" << it->first);
     Bucket &bucket = it->second;
     assert(!bucket.empty());
     Entry result = bucket.front();

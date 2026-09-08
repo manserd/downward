@@ -43,12 +43,12 @@ LWEvaluator::TypeID LWEvaluator::get_or_create_current_improving_type_id(const S
     return new_type_id;
 }
 
-void LWEvaluator::notify_initial_state(const State& /*initial_state*/)
+void LWEvaluator::notify_initial_state(const State& initial_state)
 {
     outl("notify_initial_state " << initial_state.get_id());
 }
 
-void LWEvaluator::notify_state_transition(const State &parent_state, OperatorID /*op_id*/, const State &/*state*/)
+void LWEvaluator::notify_state_transition(const State &parent_state, OperatorID /*op_id*/, const State &state)
 {
     /*
     We use this mechanism to detect when a new expansion starts: when this is the case,
@@ -71,7 +71,7 @@ void LWEvaluator::notify_state_transition(const State &parent_state, OperatorID 
         /* Reset the improving type IDs. */
         current_improving_type_ids.clear();
 
-        outl("* current parent " << parent_state.get_id() << " lw=" << current_parent_low_water_mark_value << " type [" << current_nonimproving_type_id.value() << "]");
+        outl("* current parent " << parent_state.get_id() << " lw=" << current_parent_low_water_mark_value << " type [" << current_nonimproving_type_id << "]");
 
     }
 

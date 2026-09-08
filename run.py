@@ -24,7 +24,7 @@ elif platform.system() == 'Darwin':
     # macOS requires manually adding the working directory to PATH (for ./validate).
     os.environ['PATH'] += ':.'
 
-SEED = 2
+SEED = os.environ['SEED'] if 'SEED' in os.environ else 2
 
 SEARCHES = {
     'astar': 'astar(ff())',

@@ -216,6 +216,13 @@ create_fast_downward_library(
 )
 
 create_fast_downward_library(
+        NAME one_open_list
+        HELP "one"
+        SOURCES
+        open_lists/one_open_list
+)
+
+create_fast_downward_library(
     NAME dynamic_bitset
     HELP "Poor man's version of boost::dynamic_bitset"
     SOURCES

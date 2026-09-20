@@ -30,12 +30,13 @@ SEARCHES = {
     'astar': 'astar(ff())',
     'gbfs': 'eager(single(ff()))',
     'type': f'let(h, ff(), eager(alt([single(h), type_based([h, g()], random_seed={SEED})])))',
-    '_hi': f'eager(type_based([hi(ff())], random_seed={SEED}))',
-    'hi': f'let(h, ff(), eager(alt([single(h), type_based([hi(h)], random_seed={SEED})])))',
+    'hieval': f'let(h, ff(), eager(alt([single(h), type_based([hi(h)], random_seed={SEED})])))',
     'hiol': 'let(h, ff(), eager(alt([single(h), lw_list(h)])))',
-    '_lw': f'eager(type_based([lw(ff())], random_seed={SEED}))',
-    'lw': f'let(h, ff(), eager(alt([single(h), type_based([lw(h)], random_seed={SEED})])))',
+    'lweval': f'let(h, ff(), eager(alt([single(h), type_based([lw(h)], random_seed={SEED})])))',
     'lwol': 'let(h, ff(), eager(alt([single(h), hi_list(progress(h))])))',
+    'soft': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'hiHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'lwHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))'
 }
 
 BENCHMARKS = {
@@ -50,7 +51,7 @@ BENCHMARKS = {
     'redirect2': 'examples/redirect2/1.pddl',
 }
 
-MODES = ['r', 'r_', 'd', 'd_']
+MODES = ['r', '_r', 'r_', 'd', '_d', 'd_']
 
 mode = sys.argv[1]
 if not mode in MODES:
@@ -72,16 +73,17 @@ if not benchmark in BENCHMARKS:
 
 # "note that options are passed without --, e.g., python3 build.py build=debug" (https://github.com/aibasel/downward/blob/main/BUILD.md#optional-plan-validator)
 # I haven't had any problems so far, but maybe this will matter at some point.
-if not mode[-1] == '_':
+if not mode[0] == '_':
     build_command = 'python3 build.py'
-    if mode[0] == 'd':
+    if mode[-1] == 'd':
         build_command += ' --debug'
     print(build_command)
     subprocess.run(build_command, shell=True, check=True)
 
-run_command = 'python3 fast-downward.py'
-if mode[0] == 'd':
-    run_command += ' --build debug'
-run_command += f' --validate "{BENCHMARKS[benchmark]}" --search "{SEARCHES[search]}"'
-print(run_command)
-subprocess.run(run_command, shell=True)
+if not mode[-1] == '_':
+  run_command = 'python3 fast-downward.py'
+  if mode[0] == 'd':
+      run_command += ' --build debug'
+  run_command += f' --validate "{BENCHMARKS[benchmark]}" --search "{SEARCHES[search]}"'
+  print(run_command)
+  subprocess.run(run_command, shell=True)

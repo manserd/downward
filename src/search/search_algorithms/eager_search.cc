@@ -18,6 +18,7 @@
 
 #define OUT_STYLE "\x1b[93m"
 #define OUT_PREFIX "[es] "
+#define OUT_OFF
 #include "../../out.h"
 
 using namespace std;

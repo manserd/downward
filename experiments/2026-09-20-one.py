@@ -1,41 +1,39 @@
 #! /usr/bin/env python
 
-"""
-This script uses the FastDownwardExperiment class, which makes the script very
-concise, but harder to extend once you go beyond "standard" experiments.
-Therefore, we recommend using the Experiment class directly. See the script in
-examples/downward/2020-09-11-B-bounded-cost.py for an example.
-"""
-
 import os
 
 import custom_parser
 import project
 
-REPO = project.get_repo_base()
-BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"]
+REPO = project.get_repo_base() # path to downward repo
+
+BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"] # path to benchmarks
+
+# TODO:?
 SCP_LOGIN = "myname@myserver.com"
 REMOTE_REPOS_DIR = "/infai/username/projects"
+
 # If REVISION_CACHE is None, the default "./data/revision-cache/" is used.
-REVISION_CACHE = os.environ.get("DOWNWARD_REVISION_CACHE")
-# if False:
-#     SUITE = project.SUITE_SATISFICING
-#     ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch")
-# else:
-#     SUITE = ["depot:p01.pddl", "grid:prob01.pddl", "gripper:prob01.pddl"]
-#     ENV = project.LocalEnvironment(processes=2)
-ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch")
+REVISION_CACHE = os.environ.get("DOWNWARD_REVISION_CACHE") # path to revision cache
+
+# ENV = project.LocalEnvironment(processes=2) # TODO: ?
+ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch") # TODO: email?
+# SUITE = project.SUITE_SATISFICING # TODO: ?
 SUITE = ["depot:p01.pddl", "grid:prob01.pddl", "gripper:prob01.pddl"]
 
 CONFIGS = [
   ('lmcut', ['--search', 'astar(lmcut())']),
   ('blind', ['--search', 'astar(blind())'])
 ]
+
 BUILD_OPTIONS = []
-DRIVER_OPTIONS = ["--overall-time-limit", "5m"]
+DRIVER_OPTIONS = ["--overall-time-limit", "5m"] # time limit!
+
+# repo revision axis
 REV_NICKS = [
   ("main", ""),
 ]
+
 ATTRIBUTES = [
   "error",
   "run_dir",
@@ -52,7 +50,7 @@ ATTRIBUTES = [
 exp = project.FastDownwardExperiment(environment=ENV, revision_cache=REVISION_CACHE)
 for config_nick, config in CONFIGS:
   for rev, rev_nick in REV_NICKS:
-    algo_name = f"{rev_nick}:{config_nick}" if rev_nick else config_nick
+    algo_name = f"{rev_nick}:{config_nick}" if rev_nick else config_nick # probably just a descriptive name
     exp.add_algorithm(
         algo_name,
         REPO,
@@ -66,7 +64,7 @@ exp.add_suite(BENCHMARKS_DIR, SUITE)
 exp.add_parser(exp.EXITCODE_PARSER)
 exp.add_parser(exp.TRANSLATOR_PARSER)
 exp.add_parser(exp.SINGLE_SEARCH_PARSER)
-exp.add_parser(custom_parser.get_parser())
+exp.add_parser(custom_parser.get_parser()) # example for a custom parser
 exp.add_parser(exp.PLANNER_PARSER)
 
 exp.add_step("build", exp.build)
@@ -78,9 +76,11 @@ project.add_absolute_report(
     exp, attributes=ATTRIBUTES, filter=[project.add_evaluations_per_time]
 )
 
+# probably irrelevant for me
 if not project.REMOTE:
   project.add_scp_step(exp, SCP_LOGIN, REMOTE_REPOS_DIR)
 
+# TODO: ?
 attributes = ["expansions"]
 pairs = [
   ("01-cg", "02-ff"),

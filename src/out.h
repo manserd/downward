@@ -1,7 +1,7 @@
 #ifndef OUT_H
 #define OUT_H
 
-#ifndef NDEBUG
+#if !defined(NDEBUG) && !defined(OUT_OFF)
 
 #include "search/utils/logging.h"
 

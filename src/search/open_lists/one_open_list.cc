@@ -177,6 +177,100 @@ public:
     }
 };
 
+template<typename Entry> class LOTS
+{
+public:
+    using TypeKey = Entry;
+
+    struct TypeInfo
+    {
+        TypeKey key;
+        int depth{};
+        int lw{};
+        int h{};
+    };
+
+private:
+    std::shared_ptr<Evaluator> h;
+    utils::HashMap<Entry, TypeInfo> info_by_entry;
+    std::optional<TypeInfo> parent;
+    utils::HashMap<int, Entry> new_type_key_by_lw;
+
+public:
+    explicit LOTS(const std::shared_ptr<Evaluator>& h) : h(h)
+    {
+    }
+
+    void notify_new_expansion(const Entry& parent_entry)
+    {
+        parent = info_by_entry.at(parent_entry);
+        info_by_entry.erase(parent_entry);
+        new_type_key_by_lw.clear();
+    }
+
+    TypeInfo assign_type(EvaluationContext& eval_context, const Entry& child)
+    {
+        assert(!info_by_entry.contains(child));
+        // TODO: can this happen?
+        if (const auto it = info_by_entry.find(child); it != info_by_entry.end()) {
+            return it->second;
+        }
+
+        const int child_h = eval_context.get_evaluator_value_or_infinity(h.get());
+
+        std::optional<TypeKey> key;
+        int depth;
+        int lw;
+        if (!parent.has_value()) {
+            depth = 0;
+            lw = child_h;
+            key.emplace(child);
+        } else if (child_h < parent.value().lw) {
+            depth = parent.value().depth + 1;
+            lw = child_h;
+            if (!new_type_key_by_lw.contains(child_h)) {
+                new_type_key_by_lw.emplace(child_h, child);
+            }
+            key.emplace(new_type_key_by_lw.at(child_h));
+        } else {
+            depth = parent.value().depth;
+            lw = parent.value().lw;
+            key.emplace(parent.value().key);
+        }
+
+        TypeInfo info = {
+            .key = key.value(),
+            .depth = depth,
+            .lw = lw,
+            .h = child_h,
+        };
+        info_by_entry.emplace(child, info);
+        return info;
+    }
+
+    bool is_dead_end(EvaluationContext& eval_context) const
+    {
+        return eval_context.is_evaluator_value_infinite(h.get());
+    }
+
+    bool is_reliable_dead_end(EvaluationContext& eval_context) const
+    {
+        return is_dead_end(eval_context) && h->dead_ends_are_reliable();
+    }
+
+    void get_path_dependent_evaluators(std::set<Evaluator*>& evals) const
+    {
+        h->get_path_dependent_evaluators(evals);
+    }
+
+    void clear()
+    {
+        info_by_entry.clear();
+        parent.reset();
+        new_type_key_by_lw.clear();
+    }
+};
+
 /*
 Storage.
 */
@@ -324,157 +418,12 @@ public:
     }
 };
 
-template<typename BucketKey, typename BucketItem> class HHBuckets
-{
-    using Bucket = HBucket<BucketItem>;
-
-    struct Group
-    {
-        std::vector<std::size_t> positions;
-        double weight{};
-    };
-
-    struct Item
-    {
-        BucketKey key;
-        Bucket bucket;
-        int bias{};
-        std::size_t position_in_group{};
-    };
-
-    std::vector<Item> items;
-    utils::HashMap<int, Group> group_by_bias;
-    utils::HashMap<BucketKey, std::size_t> position_by_bucket_key;
-    double total_weight = 0;
-    double bucket_temperature;
-    double state_temperature;
-
-    void add_to_group(std::size_t position)
-    {
-        assert(utils::in_bounds(position, items));
-        auto bias = items[position].bias;
-        const bool is_new_group = !group_by_bias.contains(bias);
-        auto& group = group_by_bias[bias];
-        if (is_new_group) {
-            group.weight = std::exp(-bias / bucket_temperature);
-            total_weight += group.weight;
-        }
-        items[position].position_in_group = group.positions.size();
-        group.positions.push_back(position);
-    }
-
-    void remove_from_group(std::size_t position)
-    {
-        assert(utils::in_bounds(position, items));
-        auto& item = items[position];
-        auto& group = group_by_bias.at(item.bias);
-        if (item.position_in_group != group.positions.size() - 1) {
-            assert(utils::in_bounds(item.position_in_group, group.positions));
-            group.positions[item.position_in_group] = group.positions.back();
-            assert(utils::in_bounds(group.positions[item.position_in_group], items));
-            items[group.positions[item.position_in_group]].position_in_group = item.position_in_group;
-        }
-        group.positions.pop_back();
-        if (group.positions.empty()) {
-            total_weight -= group.weight;
-            group_by_bias.erase(item.bias);
-        }
-    }
-
-    void add_bucket(const BucketKey& bucket_key, int bias)
-    {
-        position_by_bucket_key[bucket_key] = items.size();
-        items.push_back(Item{.key = bucket_key, .bucket = Bucket(1.0), .bias = bias});
-        add_to_group(items.size() - 1);
-    }
-
-public:
-    explicit HHBuckets(
-        const double bucket_temperature,
-        const double state_temperature
-    ) : bucket_temperature(bucket_temperature),
-        state_temperature(state_temperature)
-    {
-    }
-
-    void bucket_add(const BucketKey& bucket_key, const int bias_if_new, const BucketItem& entry, int h)
-    {
-        if (!position_by_bucket_key.contains(bucket_key)) {
-            add_bucket(bucket_key, bias_if_new);
-        }
-        auto position = position_by_bucket_key.at(bucket_key);
-        assert(utils::in_bounds(position, items));
-        Bucket& bucket = items[position].bucket;
-        int min_h_before = bucket.get_min_h();
-        bucket.add(entry, h);
-        if (bucket.get_min_h() != min_h_before) {
-            remove_from_group(position);
-            items[position].bias = bucket.get_min_h();
-            add_to_group(position);
-        }
-    }
-
-    BucketItem remove_random(RNG& rng)
-    {
-        assert(!empty());
-
-        /* Select bucket. */
-        double x = rng->random() * total_weight;
-        const Group* group = nullptr;
-        for (const auto& [candidate_bias, candidate_group] : group_by_bias) {
-            group = &candidate_group;
-            if (x < candidate_group.weight) {
-                break;
-            }
-            x -= candidate_group.weight;
-        }
-        assert(!group->positions.empty());
-        auto position_in_group = rng->random(group->positions.size());
-        assert(utils::in_bounds(position_in_group, group->positions));
-        std::size_t position = group->positions[position_in_group];
-
-        /* Select entry. */
-        assert(utils::in_bounds(position, items));
-        Bucket& bucket = items[position].bucket;
-        int min_h_before = bucket.get_min_h();
-        auto entry = bucket.remove_random(rng);
-
-        /* Delete bucket if empty. */
-        if (bucket.empty()) {
-            remove_from_group(position);
-            position_by_bucket_key.erase(items[position].key);
-            if (position != items.size() - 1) {
-                auto& swap_item = items.back();
-                group_by_bias.at(swap_item.bias).positions[swap_item.position_in_group] = position;
-                position_by_bucket_key.at(swap_item.key) = position;
-                items[position] = std::move(items.back());
-            }
-            items.pop_back();
-        }
-
-        /* else, update group if min h changed. */
-        else if (bucket.get_min_h() != min_h_before) {
-            remove_from_group(position);
-            items[position].bias = bucket.get_min_h();
-            add_to_group(position);
-        }
-
-        return entry;
-    }
-
-    [[nodiscard]] bool empty() const
-    {
-        return group_by_bias.empty();
-    }
-
-    void clear()
-    {
-        items.clear();
-        group_by_bias.clear();
-        position_by_bucket_key.clear();
-        total_weight = 0;
-    }
-};
+#include "one_open_list/uu.h"
+#include "one_open_list/uh.h"
+#include "one_open_list/hu.h"
+#include "one_open_list/hh.h"
+#include "one_open_list/dh.h"
+#include "one_open_list/du.h"
 
 /*
 Open List.
@@ -493,7 +442,7 @@ protected:
     void do_insertion(EvaluationContext& eval_context, const Entry& entry) override
     {
         auto info = type_system.assign_type(eval_context, entry);
-        buckets.bucket_add(info.key, info.depth, entry, info.h);
+        buckets.bucket_add(info, entry);
     }
 
 public:
@@ -560,12 +509,22 @@ class OneOpenListFactory : public OpenListFactory
         if (type_system == "hg") {
             using TypeSystem = HGTS<Entry>;
             using TypeKey = std::vector<int>;
-            using Storage = HHBuckets<TypeKey, Entry>;
-            if (bucket_selection == "H") {
-                if (state_selection == "H") {
+            if (bucket_selection == "U") {
+                if (state_selection == "U") {
+                    using Storage = UUBuckets<TypeKey, Entry>;
                     return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
                         TypeSystem(heuristic, evaluators),
-                        Storage(bucket_temperature, state_temperature),
+                        Storage(),
+                        random_seed
+                    );
+                }
+            }
+            if (bucket_selection == "H") {
+                if (state_selection == "U") {
+                    using Storage = HUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic, evaluators),
+                        Storage(bucket_temperature),
                         random_seed
                     );
                 }
@@ -574,9 +533,111 @@ class OneOpenListFactory : public OpenListFactory
         if (type_system == "hi") {
             using TypeSystem = HITS<Entry>;
             using TypeKey = Entry;
-            using Storage = HHBuckets<TypeKey, Entry>;
-            if (bucket_selection == "H") {
+            if (bucket_selection == "U") {
+                if (state_selection == "U") {
+                    using Storage = UUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(),
+                        random_seed
+                    );
+                }
                 if (state_selection == "H") {
+                    using Storage = UHBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(state_temperature),
+                        random_seed
+                    );
+                }
+            }
+            if (bucket_selection == "H") {
+                if (state_selection == "U") {
+                    using Storage = HUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature),
+                        random_seed
+                    );
+                }
+                if (state_selection == "H") {
+                    using Storage = HHBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature, state_temperature),
+                        random_seed
+                    );
+                }
+            }
+            if (bucket_selection == "D") {
+                if (state_selection == "U") {
+                    using Storage = DUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature),
+                        random_seed
+                    );
+                }
+                if (state_selection == "H") {
+                    using Storage = DHBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature, state_temperature),
+                        random_seed
+                    );
+                }
+            }
+        }
+        if (type_system == "lw") {
+            using TypeSystem = LOTS<Entry>;
+            using TypeKey = Entry;
+            if (bucket_selection == "U") {
+                if (state_selection == "U") {
+                    using Storage = UUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(),
+                        random_seed
+                    );
+                }
+                if (state_selection == "H") {
+                    using Storage = UHBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(state_temperature),
+                        random_seed
+                    );
+                }
+            }
+            if (bucket_selection == "H") {
+                if (state_selection == "U") {
+                    using Storage = HUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature),
+                        random_seed
+                    );
+                }
+                if (state_selection == "H") {
+                    using Storage = HHBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature, state_temperature),
+                        random_seed
+                    );
+                }
+            }
+            if (bucket_selection == "D") {
+                if (state_selection == "U") {
+                    using Storage = DUBuckets<TypeKey, Entry>;
+                    return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
+                        TypeSystem(heuristic),
+                        Storage(bucket_temperature),
+                        random_seed
+                    );
+                }
+                if (state_selection == "H") {
+                    using Storage = DHBuckets<TypeKey, Entry>;
                     return std::make_unique<OneOpenList<Entry, TypeSystem, Storage>>(
                         TypeSystem(heuristic),
                         Storage(bucket_temperature, state_temperature),

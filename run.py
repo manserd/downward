@@ -34,9 +34,21 @@ SEARCHES = {
     'hiol': 'let(h, ff(), eager(alt([single(h), lw_list(h)])))',
     'lweval': f'let(h, ff(), eager(alt([single(h), type_based([lw(h)], random_seed={SEED})])))',
     'lwol': 'let(h, ff(), eager(alt([single(h), hi_list(progress(h))])))',
-    'soft': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'onetype': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'hgUu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'hgHu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'hiUu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'hiUh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'hiHu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
     'hiHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
-    'lwHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))'
+    'hiDu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'hiDh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'lwUu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'lwUh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'lwHu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'lwHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'lwDu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
+    'lwDh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
 }
 
 BENCHMARKS = {

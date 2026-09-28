@@ -15,4 +15,9 @@ lwHh 227
 lwDu 227
 lwDh 230
 
-all my hi/lw except Uu are noticably lower than theirs. these are all the variants that do softmin. maybe numerical issues are actually to blame?
+all my hi/lw except Uu are noticably lower than theirs. these are all the variants that do softmin.
+
+possible reasons for this difference:
+- numerical issues when caching weights
+- possibly faster softmin in their implementation?
+- they used ipc 11 and 14. i use ipc 08, 11, 14, 18.

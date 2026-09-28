@@ -4,8 +4,8 @@ import subprocess
 import sys
 
 assert os.path.isdir('builds')
-assert (os.path.isdir('builds_windows') and not os.path.isdir('builds_macos')) or (
-    os.path.isdir('builds_macos') and not os.path.isdir('builds_windows'))
+# assert (os.path.isdir('builds_windows') and not os.path.isdir('builds_macos')) or (
+    # os.path.isdir('builds_macos') and not os.path.isdir('builds_windows'))
 
 if platform.system() == 'Windows':
     if os.path.isdir('builds_macos'):
@@ -24,32 +24,24 @@ elif platform.system() == 'Darwin':
     # macOS requires manually adding the working directory to PATH (for ./validate).
     os.environ['PATH'] += ':.'
 
-SEED = os.environ['SEED'] if 'SEED' in os.environ else 2
+COST_TYPE = 'one'
+H_EXPR = f'ff(transform=adapt_costs(cost_type={COST_TYPE}))'
+SEED = os.environ['SEED'] if 'SEED' in os.environ else 0
+
+def one(ts, evals, bs, bt, ss, st, seed):
+    return f'let(h, {H_EXPR}, eager(alt([single(h), one(type_system=\\"{ts}\\", evaluators=[{evals}], heuristic=h, bucket_selection=\\"{bs}\\", bucket_temperature={bt}, state_selection=\\"{ss}\\", state_temperature={st}, random_seed={seed})]), cost_type={COST_TYPE}))'
 
 SEARCHES = {
-    'astar': 'astar(ff())',
-    'gbfs': 'eager(single(ff()))',
-    'type': f'let(h, ff(), eager(alt([single(h), type_based([h, g()], random_seed={SEED})])))',
-    'hieval': f'let(h, ff(), eager(alt([single(h), type_based([hi(h)], random_seed={SEED})])))',
-    'hiol': 'let(h, ff(), eager(alt([single(h), lw_list(h)])))',
-    'lweval': f'let(h, ff(), eager(alt([single(h), type_based([lw(h)], random_seed={SEED})])))',
-    'lwol': 'let(h, ff(), eager(alt([single(h), hi_list(progress(h))])))',
-    'onetype': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'hgUu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'hgHu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hg\\", evaluators=[h, g()], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'hiUu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'hiUh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
-    'hiHu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'hiHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
-    'hiDu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'hiDh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"hi\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
-    'lwUu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'lwUh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"U\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
-    'lwHu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'lwHh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"H\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
-    'lwDu': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"U\\", state_temperature=1.0)])))',
-    'lwDh': 'let(h, ff(), eager(alt([single(h), one(type_system=\\"lw\\", evaluators=[], heuristic=h, bucket_selection=\\"D\\", bucket_temperature=1.0, state_selection=\\"H\\", state_temperature=1.0)])))',
+    'astar': f'astar({H_EXPR})',
+    'gbfs': f'eager(single({H_EXPR}), cost_type={COST_TYPE})',
+    'type': f'let(h, {H_EXPR}, eager(alt([single(h), type_based([h, g()], random_seed={SEED})]), cost_type={COST_TYPE}))',
 }
+for bs in ['U', 'H']:
+    SEARCHES[f'hg{bs}u'] = one('hg', 'h, g()', bs, '1.0', 'U', '1.0', SEED)
+for ts in ['hi', 'lw']:
+    for bs in ['U', 'H', 'D']:
+        for ss in ['U', 'H']:
+            SEARCHES[f'{ts}{bs}{ss.lower()}'] = one(ts, '', bs, '1.0', ss, '1.0', SEED)
 
 BENCHMARKS = {
     'gripper': 'misc/tests/benchmarks/gripper/prob01.pddl',
@@ -83,18 +75,22 @@ if not benchmark in BENCHMARKS:
     print('\n'.join(map(lambda i: '- ' + i, BENCHMARKS.keys())))
     exit(1)
 
+debug = 'd' in mode
+do_build = mode[0] != '_'
+do_run = mode[-1] != '_'
+
 # "note that options are passed without --, e.g., python3 build.py build=debug" (https://github.com/aibasel/downward/blob/main/BUILD.md#optional-plan-validator)
 # I haven't had any problems so far, but maybe this will matter at some point.
-if not mode[0] == '_':
+if do_build:
     build_command = 'python3 build.py'
-    if mode[-1] == 'd':
+    if debug:
         build_command += ' --debug'
     print(build_command)
     subprocess.run(build_command, shell=True, check=True)
 
-if not mode[-1] == '_':
+if do_run:
   run_command = 'python3 fast-downward.py'
-  if mode[0] == 'd':
+  if debug:
       run_command += ' --build debug'
   run_command += f' --validate "{BENCHMARKS[benchmark]}" --search "{SEARCHES[search]}"'
   print(run_command)

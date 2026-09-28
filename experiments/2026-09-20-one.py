@@ -18,16 +18,21 @@ REVISION_CACHE = os.environ.get("DOWNWARD_REVISION_CACHE") # path to revision ca
 
 # ENV = project.LocalEnvironment(processes=2) # TODO: ?
 ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch") # TODO: email?
-# SUITE = project.SUITE_SATISFICING # TODO: ?
-SUITE = ["depot:p01.pddl", "grid:prob01.pddl", "gripper:prob01.pddl"]
+SUITE = project.SUITE_SATISFICING # TODO: ?
+# SUITE = ["depot:p01.pddl", "grid:prob01.pddl", "gripper:prob01.pddl"]
 
 CONFIGS = [
-  ('lmcut', ['--search', 'astar(lmcut())']),
-  ('blind', ['--search', 'astar(blind())'])
+  ('gbfs', ['--search', 'eager(single(ff()))']),
 ]
+for bs in ['U', 'H']:
+  CONFIGS.append((f'hg{bs}u', ['--search', f'let(h, ff(), eager(alt([single(h), one(type_system="hg", evaluators=[h, g()], heuristic=h, bucket_selection="{bs}", bucket_temperature=1.0, state_selection="U", state_temperature=1.0)])))']))
+for ts in ['hi', 'lw']:
+  for bs in ['U', 'H', 'D']:
+    for ss in ['U', 'H']:
+      CONFIGS.append((f'{ts}{bs}{ss.lower()}', ['--search', f'let(h, ff(), eager(alt([single(h), one(type_system="{ts}", evaluators=[], heuristic=h, bucket_selection="{bs}", bucket_temperature=1.0, state_selection="{ss}", state_temperature=1.0)])))']))
 
 BUILD_OPTIONS = []
-DRIVER_OPTIONS = ["--overall-time-limit", "5m"] # time limit!
+DRIVER_OPTIONS = ["--overall-time-limit", "30m"] # time limit!
 
 # repo revision axis
 REV_NICKS = [

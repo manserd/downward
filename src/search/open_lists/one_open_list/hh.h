@@ -7,12 +7,6 @@ template<typename BucketKey, typename BucketItem> class HHBuckets
 {
     using Bucket = HBucket<BucketItem>;
 
-    struct Group
-    {
-        std::vector<std::size_t> positions;
-        double weight{};
-    };
-
     struct Item
     {
         BucketKey key;
@@ -22,11 +16,27 @@ template<typename BucketKey, typename BucketItem> class HHBuckets
     };
 
     std::vector<Item> items;
-    utils::HashMap<int, Group> group_by_bias;
     utils::HashMap<BucketKey, std::size_t> position_by_bucket_key;
+
+    struct Group
+    {
+        std::vector<std::size_t> positions;
+#ifdef DO_CACHE_WEIGHTS
+        double weight{};
+#endif
+    };
+
+    utils::HashMap<int, Group> group_by_bias;
+#ifdef DO_CACHE_WEIGHTS
     double total_weight = 0;
+#endif
     double bucket_temperature;
     double state_temperature;
+
+    [[nodiscard]] double compute_weight(const int bias) const
+    {
+        return std::exp(-bias / bucket_temperature);
+    }
 
     void add_to_group(std::size_t position)
     {
@@ -34,10 +44,12 @@ template<typename BucketKey, typename BucketItem> class HHBuckets
         auto bias = items[position].bias;
         const bool is_new_group = !group_by_bias.contains(bias);
         auto& group = group_by_bias[bias];
+#ifdef DO_CACHE_WEIGHTS
         if (is_new_group) {
-            group.weight = std::exp(-bias / bucket_temperature);
+            group.weight = compute_weight(bias);
             total_weight += group.weight;
         }
+#endif
         items[position].position_in_group = group.positions.size();
         group.positions.push_back(position);
     }
@@ -55,7 +67,9 @@ template<typename BucketKey, typename BucketItem> class HHBuckets
         }
         group.positions.pop_back();
         if (group.positions.empty()) {
+#ifdef DO_CACHE_WEIGHTS
             total_weight -= group.weight;
+#endif
             group_by_bias.erase(item.bias);
         }
     }
@@ -98,14 +112,25 @@ public:
         assert(!empty());
 
         /* Select bucket. */
+#ifndef DO_CACHE_WEIGHTS
+        double total_weight = 0;
+        for (auto& bias : group_by_bias | std::views::keys) {
+            total_weight += compute_weight(bias);
+        }
+#endif
         double x = rng->random() * total_weight;
         const Group* group = nullptr;
         for (const auto& [candidate_bias, candidate_group] : group_by_bias) {
             group = &candidate_group;
-            if (x < candidate_group.weight) {
+#ifdef DO_CACHE_WEIGHTS
+            const double weight = candidate_group.weight;
+#else
+            const double weight = compute_weight(candidate_bias);
+#endif
+            if (x < weight) {
                 break;
             }
-            x -= candidate_group.weight;
+            x -= weight;
         }
         assert(!group->positions.empty());
         auto position_in_group = rng->random(group->positions.size());
@@ -151,7 +176,9 @@ public:
         items.clear();
         group_by_bias.clear();
         position_by_bucket_key.clear();
+#ifdef DO_CACHE_WEIGHTS
         total_weight = 0;
+#endif
     }
 };
 

@@ -1,0 +1,18 @@
+coverage * 0.1125 to be comparable to paper
+
+gbfs 198
+
+type 227
+hiUu 213
+lwUu 209
+
+hiHu 233
+hiHh 233
+hiDu 233
+hiDh 232
+lwHu 227
+lwHh 227
+lwDu 227
+lwDh 230
+
+all my hi/lw except Uu are noticably lower than theirs. these are all the variants that do softmin. maybe numerical issues are actually to blame?

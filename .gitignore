@@ -5,6 +5,7 @@ __pycache__/
 /builds/
 /builds_windows/
 /builds_macos/
+/test.py
 /experiments/data/
 /misc/.tox/
 /misc/autodoc/downward-xmlrpc.secret

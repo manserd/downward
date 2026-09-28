@@ -11,6 +11,8 @@
 #define OUT_PREFIX "one "
 #include "../../out.h"
 
+// #define DO_CACHE_WEIGHTS
+
 namespace one_open_list {
 
 using RNG = std::shared_ptr<utils::RandomNumberGenerator>;
@@ -127,6 +129,11 @@ public:
     TypeInfo assign_type(EvaluationContext& eval_context, const Entry& child)
     {
         assert(!info_by_entry.contains(child));
+        // TODO: can this happen?
+        if (const auto it = info_by_entry.find(child); it != info_by_entry.end()) {
+            return it->second;
+        }
+
         const int child_h = eval_context.get_evaluator_value_or_infinity(h.get());
 
         std::optional<TypeKey> key;
@@ -136,7 +143,7 @@ public:
             key.emplace(child);
         } else if (child_h < parent.value().h) {
             depth = parent.value().depth + 1;
-            if (!new_type_key) {
+            if (!new_type_key.has_value()) {
                 new_type_key.emplace(child);
             }
             key.emplace(new_type_key.value());
@@ -296,7 +303,7 @@ template<typename Entry> class UBucket
     }
 
 public:
-    void add(Entry entry, int h)
+    void add(const Entry& entry, int h)
     {
         items.push_back(Item{.entry = entry, .h = h});
         ++h_counts[h];
@@ -340,11 +347,15 @@ template<typename Entry> class HBucket
     struct Group
     {
         std::vector<Entry> entries;
+#ifdef DO_CACHE_WEIGHTS
         double weight{};
+#endif
     };
 
     utils::HashMap<int, Group> group_by_h;
+#ifdef DO_CACHE_WEIGHTS
     double total_weight = 0;
+#endif
     int min_h = EvaluationResult::INFTY;
     double state_temperature;
 
@@ -356,6 +367,11 @@ template<typename Entry> class HBucket
         }
     }
 
+    [[nodiscard]] double compute_weight(const int h) const
+    {
+        return std::exp(-h / state_temperature);
+    }
+
 public:
     explicit HBucket(const double state_temperature) : state_temperature(state_temperature) {}
 
@@ -363,10 +379,12 @@ public:
     {
         const bool is_new_group = !group_by_h.contains(h);
         auto& group = group_by_h[h];
+#ifdef DO_CACHE_WEIGHTS
         if (is_new_group) {
-            group.weight = std::exp(-h / state_temperature);
+            group.weight = compute_weight(h);
             total_weight += group.weight;
         }
+#endif
         group.entries.push_back(entry);
         min_h = std::min(min_h, h);
     }
@@ -376,16 +394,27 @@ public:
         assert(!empty());
 
         /* Select item. */
+#ifndef DO_CACHE_WEIGHTS
+        double total_weight = 0;
+        for (auto& h : group_by_h | std::views::keys) {
+            total_weight += compute_weight(h);
+        }
+#endif
         double x = rng->random() * total_weight;
         Group* group = nullptr;
         int h = EvaluationResult::INFTY;
         for (auto& [candidate_h, candidate_group] : group_by_h) {
             group = &candidate_group;
             h = candidate_h;
-            if (x < candidate_group.weight) {
+#ifdef DO_CACHE_WEIGHTS
+            const double weight = candidate_group.weight;
+#else
+            const double weight = compute_weight(candidate_h);
+#endif
+            if (x < weight) {
                 break;
             }
-            x -= candidate_group.weight;
+            x -= weight;
         }
         assert(!group->entries.empty());
         std::size_t position_in_group = rng->random(group->entries.size());
@@ -393,11 +422,13 @@ public:
         /* Delete item. */
         Entry entry = group->entries[position_in_group];
         if (position_in_group != group->entries.size() - 1) {
-            group->entries[position_in_group] = group->entries.back();
+            group->entries[position_in_group] = std::move(group->entries.back());
         }
         group->entries.pop_back();
         if (group->entries.empty()) {
+#ifdef DO_CACHE_WEIGHTS
             total_weight -= group->weight;
+#endif
             group_by_h.erase(h);
         }
         if (h == min_h && !group_by_h.contains(h)) {

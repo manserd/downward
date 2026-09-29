@@ -1,14 +1,16 @@
-gbfs 197
 
-type 209
-hiUu 196
-lwUu 210
 
-hiHu 259
-hiHh 277
-hiDu 265
-hiDh 268
-lwHu 251
-lwHh 266
-lwDu 256
-lwDh 271
+gbfs 197 -1
+
+type 209 -15
+hiUu 196 -10
+lwUu 210 +6
+
+hiHu 259 +4
+hiHh 277 +14
+hiDu 265 -30
+hiDh 268 -16
+lwHu 251 -5
+lwHh 266 +12
+lwDu 256 -2
+lwDh 271 +7

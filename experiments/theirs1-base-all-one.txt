@@ -1,0 +1,14 @@
+bfs 197
+
+type 210
+hiUu 199
+lwUu 209
+
+hiHu 257
+hiHh 275
+hiDu 268
+hiDh 271
+lwHu 253
+lwHh 266
+lwDu 254
+lwDh 269

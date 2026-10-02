@@ -34,7 +34,12 @@ template<typename BucketKey, typename BucketItem> class DUBuckets
 
     [[nodiscard]] double compute_weight(const int bias) const
     {
-        return std::exp(-bias / bucket_temperature);
+        const double weight = std::exp(-bias / bucket_temperature);
+        if (!std::isfinite(weight)) {
+            printf("du exp overflow!\n");
+            exit(1);
+        }
+        return weight;
     }
 
     void add_to_group(std::size_t position)
@@ -104,9 +109,13 @@ public:
 
         /* Select bucket. */
 #ifndef DO_CACHE_WEIGHTS
+        int min_bias = EvaluationResult::INFTY;
+        for (auto& bias : group_by_bias | std::views::keys) {
+            min_bias = std::min(min_bias, bias);
+        }
         double total_weight = 0;
         for (auto& bias : group_by_bias | std::views::keys) {
-            total_weight += compute_weight(bias);
+            total_weight += compute_weight(bias - min_bias);
         }
 #endif
         double x = rng->random() * total_weight;
@@ -116,7 +125,7 @@ public:
 #ifdef DO_CACHE_WEIGHTS
             const double weight = candidate_group.weight;
 #else
-            const double weight = compute_weight(candidate_bias);
+            const double weight = compute_weight(candidate_bias - min_bias);
 #endif
             if (x < weight) {
                 break;

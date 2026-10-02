@@ -11,8 +11,6 @@
 #define OUT_PREFIX "one "
 #include "../../out.h"
 
-// #define DO_CACHE_WEIGHTS
-
 namespace one_open_list {
 
 using RNG = std::shared_ptr<utils::RandomNumberGenerator>;
@@ -347,15 +345,9 @@ template<typename Entry> class HBucket
     struct Group
     {
         std::vector<Entry> entries;
-#ifdef DO_CACHE_WEIGHTS
-        double weight{};
-#endif
     };
 
     utils::HashMap<int, Group> group_by_h;
-#ifdef DO_CACHE_WEIGHTS
-    double total_weight = 0;
-#endif
     int min_h = EvaluationResult::INFTY;
     double state_temperature;
 
@@ -367,9 +359,14 @@ template<typename Entry> class HBucket
         }
     }
 
-    [[nodiscard]] double compute_weight(const int h) const
+    [[nodiscard]] double compute_weight(const int h, const int shift) const
     {
-        return std::exp(-h / state_temperature);
+        const double weight = std::exp(-(h - shift) / state_temperature);
+        if (!std::isfinite(weight)) {
+            printf("std::exp overflow!\n");
+            exit(1);
+        }
+        return weight;
     }
 
 public:
@@ -377,14 +374,7 @@ public:
 
     void add(const Entry& entry, int h)
     {
-        const bool is_new_group = !group_by_h.contains(h);
         auto& group = group_by_h[h];
-#ifdef DO_CACHE_WEIGHTS
-        if (is_new_group) {
-            group.weight = compute_weight(h);
-            total_weight += group.weight;
-        }
-#endif
         group.entries.push_back(entry);
         min_h = std::min(min_h, h);
     }
@@ -394,23 +384,17 @@ public:
         assert(!empty());
 
         /* Select item. */
-#ifndef DO_CACHE_WEIGHTS
         double total_weight = 0;
         for (auto& h : group_by_h | std::views::keys) {
-            total_weight += compute_weight(h);
+            total_weight += compute_weight(h, min_h);
         }
-#endif
         double x = rng->random() * total_weight;
         Group* group = nullptr;
         int h = EvaluationResult::INFTY;
         for (auto& [candidate_h, candidate_group] : group_by_h) {
             group = &candidate_group;
             h = candidate_h;
-#ifdef DO_CACHE_WEIGHTS
-            const double weight = candidate_group.weight;
-#else
-            const double weight = compute_weight(candidate_h);
-#endif
+            const double weight = compute_weight(candidate_h, min_h);
             if (x < weight) {
                 break;
             }
@@ -426,9 +410,6 @@ public:
         }
         group->entries.pop_back();
         if (group->entries.empty()) {
-#ifdef DO_CACHE_WEIGHTS
-            total_weight -= group->weight;
-#endif
             group_by_h.erase(h);
         }
         if (h == min_h && !group_by_h.contains(h)) {

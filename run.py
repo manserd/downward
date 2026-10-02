@@ -53,6 +53,8 @@ BENCHMARKS = {
     'ticket2': 'examples/ticket2/1.pddl',
     'redirect': 'examples/redirect/1.pddl',
     'redirect2': 'examples/redirect2/1.pddl',
+    'transport11-1': '../benchmarks/transport-sat11-strips/p01.pddl',
+    'transport11-5': '../benchmarks/transport-sat11-strips/p05.pddl',
 }
 
 MODES = ['r', '_r', 'r_', 'd', '_d', 'd_']

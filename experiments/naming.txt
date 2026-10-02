@@ -1,0 +1,22 @@
+experiments are named
+
+    <revision>-<set>-<cost>-<algos>-<repetitions>
+
+where
+
+- <revision> is
+    - 'base' for the base implementation
+    - 'nocachew' for the variant that computes weights on the fly
+
+- <set> is
+    - 'satmost' for SUITE_SATISFICING of project.py
+    - 'sat1114' for ipc sat 11 and 14
+
+- <cost> is
+    - 'u' for unit costs
+    - 'g' for costs as defined by the problems
+
+- <algos> is
+    - 'all' for all
+
+- <repetitions> is the number of times stochastic algorithms are repeated

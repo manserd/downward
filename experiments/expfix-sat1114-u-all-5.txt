@@ -1,0 +1,18 @@
+gbfs 199.0
+
+type 215.2
+
+hiUu 199.4
+lwUu 207.6
+
+hiHu 273.2
+hiHh 281.2
+hiDu 296.2
+hiDh 287.8
+lwHu 261.2
+lwHh 269.0
+lwDu 258.8
+lwDh 268.4
+
+hiUh 201.8
+lwUh 199.8

@@ -31,6 +31,9 @@ SEED = os.environ['SEED'] if 'SEED' in os.environ else 0
 def one(ts, evals, bs, bt, ss, st, seed):
     return f'let(h, {H_EXPR}, eager(alt([single(h), one(type_system=\\"{ts}\\", evaluators=[{evals}], heuristic=h, bucket_selection=\\"{bs}\\", bucket_temperature={bt}, state_selection=\\"{ss}\\", state_temperature={st}, random_seed={seed})]), cost_type={COST_TYPE}))'
 
+ALIASES = {
+    'lama': 'seq-sat-lama-2011',
+}
 SEARCHES = {
     'astar': f'astar({H_EXPR})',
     'gbfs': f'eager(single({H_EXPR}), cost_type={COST_TYPE})',
@@ -65,10 +68,14 @@ if not mode in MODES:
     print('\n'.join(map(lambda i: '- ' + i, MODES)))
     exit(1)
 
-search = sys.argv[2]
-if not search in SEARCHES:
-    print('Unknown search. Use one of:')
-    print('\n'.join(map(lambda i: '- ' + i, SEARCHES.keys())))
+config = sys.argv[2]
+if config in SEARCHES:
+    is_alias = False
+elif config in ALIASES:
+    is_alias = True
+else:
+    print('Unknown config. Use one of:')
+    print('\n'.join(map(lambda i: '- ' + i, list(SEARCHES.keys()) + list(ALIASES.keys()))))
     exit(1)
 
 benchmark = sys.argv[3]
@@ -91,9 +98,12 @@ if do_build:
     subprocess.run(build_command, shell=True, check=True)
 
 if do_run:
-  run_command = 'python3 fast-downward.py'
-  if debug:
-      run_command += ' --build debug'
-  run_command += f' --validate "{BENCHMARKS[benchmark]}" --search "{SEARCHES[search]}"'
-  print(run_command)
-  subprocess.run(run_command, shell=True)
+    run_command = 'python3 fast-downward.py'
+    if debug:
+        run_command += ' --build debug'
+    if is_alias:
+        run_command += f' --validate --alias "{ALIASES[config]}" "{BENCHMARKS[benchmark]}"'
+    else:
+        run_command += f' --validate "{BENCHMARKS[benchmark]}" --search "{SEARCHES[config]}"'
+    print(run_command)
+    subprocess.run(run_command, shell=True)

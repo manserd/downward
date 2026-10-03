@@ -7,10 +7,11 @@ where
 - <revision> is
     - 'base' for the base implementation
     - 'nocachew' for the variant that computes weights on the fly
+    - 'expfix' for nocachew with fixed std::exp
 
 - <set> is
     - 'satmost' for SUITE_SATISFICING of project.py
-    - 'sat1114' for ipc sat 11 and 14
+    - 'sat1114' for roughly ipc sat 11 and 14
 
 - <cost> is
     - 'u' for unit costs

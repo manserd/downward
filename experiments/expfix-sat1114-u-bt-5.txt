@@ -1,0 +1,45 @@
+240 instead of 380 tests
+childsnack was assumed at 0/20
+6 others were assumed at 20/20
+therefore we subtract 120
+from full results when comparing
+
+hg-H0_25-u1 116.2
+hg-H0_5-u1 127.8
+hg-H2-u1 151.0
+hg-H5-u1 147.4
+hg-H10-u1 141.2
+[no cmp available]
+
+hi-D0_25-u1 178.6
+hi-D0_5-u1 178.8
+(hi-D1-u1 176.2)
+hi-D2-u1 178.4
+hi-D5-u1 164.6
+hi-D10-u1 150.6
+[insignificant]
+
+
+hi-H0_25-u1 148.4
+hi-H0_5-u1 150.0
+(hi-H1-u1 153.2)
+hi-H2-u1 152.4
+hi-H5-u1 150.4
+hi-H10-u1 143.4
+[insignificant]
+
+lw-D0_25-u1 148.2
+lw-D0_5-u1 145.0
+(lw-D1-u1 138.1)
+lw-D2-u1 143.8
+lw-D5-u1 134.2
+lw-D10-u1 129.0
+[possible small improvement]
+
+lw-H0_25-u1 143.4
+lw-H0_5-u1 147.2
+(lw-H1-u1 141.2)
+lw-H2-u1 142.6
+lw-H5-u1 135.2
+lw-H10-u1 129.2
+[possible microscopic improvement]

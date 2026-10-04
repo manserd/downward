@@ -14,18 +14,18 @@ ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch")
 
 SUITE = [
   "barman-sat14-strips",
-  # "childsnack-sat14-strips",
+  # "childsnack-sat14-strips", # consistently 0/20
   "elevators-sat11-strips",
   "floortile-sat11-strips",
-  # "ged-sat14-strips",
-  # "hiking-sat14-strips",
+  # "ged-sat14-strips", # consistently about 18/20
+  # "hiking-sat14-strips", # consistently about 20/20
   "nomystery-sat11-strips",
   "openstacks-sat14-strips",
-  # "parcprinter-sat11-strips",
+  # "parcprinter-sat11-strips", # consistently about 20/20
   "parking-sat11-strips",
-  # "pegsol-sat11-strips",
-  # "scanalyzer-sat11-strips",
-  # "sokoban-sat11-strips",
+  # "pegsol-sat11-strips", # consistently about 20/20
+  # "scanalyzer-sat11-strips", # consistently about 19/20
+  # "sokoban-sat11-strips", # consistently about 19/20
   "tetris-sat14-strips",
   "thoughtful-sat14-strips",
   "tidybot-sat11-strips",

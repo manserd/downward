@@ -19,7 +19,6 @@ hi-D5-u1 164.6
 hi-D10-u1 150.6
 [insignificant]
 
-
 hi-H0_25-u1 148.4
 hi-H0_5-u1 150.0
 (hi-H1-u1 153.2)

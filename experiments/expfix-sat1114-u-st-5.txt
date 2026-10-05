@@ -1,0 +1,51 @@
+240 instead of 380 tests
+childsnack was assumed at 0/20
+6 others were assumed at 20/20
+therefore we subtract 120
+from full results when comparing
+
+hi-U1-h0_25 80.2
+hi-U1-h0_5 81.8
+(hi-U1-h1 81.8)
+hi-U1-h2 87.8 <--
+hi-U1-h5 87.6
+hi-U1-h10 86.6
+
+hi-H1-h0_25 140.8
+hi-H1-h0_5 155.0
+(hi-H1-h1 161.2)
+hi-H1-h2 160.0
+hi-H1-h5 159.4
+hi-H1-h10 159.2
+[no improvement]
+
+hi-D1-h0_25 147.6
+hi-D1-h0_5 164.8
+(hi-D1-h1 167.8)
+hi-D1-h2 172.6 <--
+hi-D1-h5 167.0
+hi-D1-h10 158.4
+
+
+lw-U1-h0_25 85.0
+lw-U1-h0_5 84.2
+(lw-U1-h1 79.8)
+lw-U1-h2 84.0
+lw-U1-h5 88.8
+lw-U1-h10 91.8 <--
+
+lw-H1-h0_25 123.0
+lw-H1-h0_5 134.4
+(lw-H1-h1 149.0)
+lw-H1-h2 150.6
+lw-H1-h5 146.2
+lw-H1-h10 140.4
+[no significant improvement]
+
+lw-D1-h0_25 127.6
+lw-D1-h0_5 132.8
+(lw-D1-h1 148.4)
+lw-D1-h2 149.6
+lw-D1-h5 148.6
+lw-D1-h10 144.2
+[no significant improvement]

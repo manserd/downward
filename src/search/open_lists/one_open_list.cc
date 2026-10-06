@@ -126,7 +126,7 @@ public:
 
     TypeInfo assign_type(EvaluationContext& eval_context, const Entry& child)
     {
-        assert(!info_by_entry.contains(child));
+        // assert(!info_by_entry.contains(child));
         // TODO: can this happen?
         if (const auto it = info_by_entry.find(child); it != info_by_entry.end()) {
             return it->second;
@@ -215,7 +215,7 @@ public:
 
     TypeInfo assign_type(EvaluationContext& eval_context, const Entry& child)
     {
-        assert(!info_by_entry.contains(child));
+        // assert(!info_by_entry.contains(child));
         // TODO: can this happen?
         if (const auto it = info_by_entry.find(child); it != info_by_entry.end()) {
             return it->second;

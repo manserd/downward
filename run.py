@@ -26,10 +26,13 @@ elif platform.system() == 'Darwin':
 
 COST_TYPE = 'one'
 H_EXPR = f'ff(transform=adapt_costs(cost_type={COST_TYPE}))'
-SEED = os.environ['SEED'] if 'SEED' in os.environ else 0
+SEED = os.environ['SEED'] if 'SEED' in os.environ else 3
 
 def one(ts, evals, bs, bt, ss, st, seed):
     return f'let(h, {H_EXPR}, eager(alt([single(h), one(type_system=\\"{ts}\\", evaluators=[{evals}], heuristic=h, bucket_selection=\\"{bs}\\", bucket_temperature={bt}, state_selection=\\"{ss}\\", state_temperature={st}, random_seed={seed})]), cost_type={COST_TYPE}))'
+
+def eps(ts, evals, bs, bt, ss, st, seed, epsilon):
+  return f'let(h, {H_EXPR}, eager(eps(single(h), one(type_system=\\"{ts}\\", evaluators=[{evals}], heuristic=h, bucket_selection=\\"{bs}\\", bucket_temperature={bt}, state_selection=\\"{ss}\\", state_temperature={st}, random_seed={seed}), epsilon={epsilon}, random_seed={int(seed) + 1000}), cost_type={COST_TYPE}))'
 
 ALIASES = {
     'lama': 'seq-sat-lama-2011',
@@ -45,6 +48,7 @@ for ts in ['hi', 'lw']:
     for bs in ['U', 'H', 'D']:
         for ss in ['U', 'H']:
             SEARCHES[f'{ts}{bs}{ss.lower()}'] = one(ts, '', bs, '1.0', ss, '1.0', SEED)
+            SEARCHES[f'{ts}{bs}{ss.lower()}/eps'] = eps(ts, '', bs, '1.0', ss, '1.0', SEED, 0.5)
 
 BENCHMARKS = {
     'gripper': 'misc/tests/benchmarks/gripper/prob01.pddl',

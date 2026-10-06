@@ -209,6 +209,13 @@ create_fast_downward_library(
 )
 
 create_fast_downward_library(
+        NAME eps_open_list
+        HELP "eps"
+        SOURCES
+        open_lists/eps_open_list
+)
+
+create_fast_downward_library(
     NAME dynamic_bitset
     HELP "Poor man's version of boost::dynamic_bitset"
     SOURCES

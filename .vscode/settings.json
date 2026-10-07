@@ -1,3 +1,15 @@
 {
-    "editor.formatOnSave": false
+    "editor.formatOnSave": false,
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#eb7213",
+        "statusBar.border": "#eb7213",
+        "statusBar.debuggingBackground": "#eb7213",
+        "statusBar.debuggingForeground": "#15202b",
+        "statusBar.foreground": "#15202b",
+        "statusBar.inactiveBackground": "#eb7213",
+        "statusBarItem.hoverBackground": "#bc5b0f",
+        "statusBarItem.remoteBackground": "#4ef196",
+        "statusBarItem.remoteForeground": "#15202b"
+    },
+    "peacock.color": "#eb7213"
 }

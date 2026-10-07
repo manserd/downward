@@ -1,0 +1,103 @@
+240 instead of 380 tests
+childsnack was assumed at 0/20
+6 others were assumed at 20/20
+therefore we subtract 120
+from full results when comparing
+
+hgUu (type)
+hg0_75-U1-u1 93.8
+hg0_5-U1-u1 101.4 <-
+(hgALT-U1-u1 95.2)
+hg0_25-U1-u1 99.4
+hg0_1-U1-u1 98.8
+
+hgHu (soft)
+hg0_75-H1-u1 146.2 <-
+hg0_5-H1-u1 139.8
+[ALT not extracted from expfix-all]
+hg0_25-H1-u1 126.8
+hg0_1-H1-u1 109.6
+
+hiUu
+hi0_75-U1-u1 73.4
+hi0_5-U1-u1 84.0
+(hiALT-U1-u1 79.4)
+hi0_25-U1-u1 92.4
+hi0_1-U1-u1 95.2 <==
+
+hiUh
+hi0_75-U1-h1 78.0
+hi0_5-U1-h1 82.2
+(hiALT-U1-h1 81.8)
+hi0_25-U1-h1 92.0
+hi0_1-U1-h1 92.4 <==
+
+hiHu
+hi0_75-H1-u1 151.0
+hi0_5-H1-u1 152.0
+(hiALT-H1-u1 153.2) <-
+hi0_25-H1-u1 144.8
+hi0_1-H1-u1 136.2
+
+hiHh
+hi0_75-H1-h1 158.2
+hi0_5-H1-h1 157.4
+(hiALT-H1-h1 161.2) <-
+hi0_25-H1-h1 151.4
+hi0_1-H1-h1 137.0
+
+hiDu
+hi0_75-D1-u1 176.0
+hi0_5-D1-u1 176.4 <-
+(hiALT-D1-u1 176.2)
+hi0_25-D1-u1 172.4
+hi0_1-D1-u1 159.2
+
+hiDh
+hi0_75-D1-h1 167.4
+hi0_5-D1-h1 168.0 <-
+(hiALT-D1-h1 167.8)
+hi0_25-D1-h1 162.2
+hi0_1-D1-h1 152.6
+
+lwUu
+lw0_75-U1-u1 81.4
+lw0_5-U1-u1 88.8
+(lwALT-U1-u1 87.6)
+lw0_25-U1-u1 93.0
+lw0_1-U1-u1 91.4 <-
+
+lwUh
+lw0_75-U1-h1 80.2
+lw0_5-U1-h1 83.2
+(lwALT-U1-h1 79.8)
+lw0_25-U1-h1 87.8
+lw0_1-U1-h1 87.8 <-
+
+lwHu
+lw0_75-H1-u1 138.8
+lw0_5-H1-u1 141.6 <-
+(lwALT-H1-u1 141.2)
+lw0_25-H1-u1 137.2
+lw0_1-H1-u1 120.8
+
+lwHh
+lw0_75-H1-h1 151.6
+lw0_5-H1-h1 147.2
+(lwALT-H1-h1 149.0) <-
+lw0_25-H1-h1 134.8
+lw0_1-H1-h1 115.4
+
+lwDu
+lw0_75-D1-u1 140.2
+lw0_5-D1-u1 143.6 <-
+(lwALT-D1-u1 138.8)
+lw0_25-D1-u1 134.6
+lw0_1-D1-u1 120.0
+
+lwDh
+lw0_75-D1-h1 152.6
+lw0_5-D1-h1 148.8 <-
+(lwALT-D1-h1 148.4)
+lw0_25-D1-h1 137.4
+lw0_1-D1-h1 120.8

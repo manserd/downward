@@ -12,47 +12,24 @@ REMOTE_REPOS_DIR = "/infai/username/projects"
 REVISION_CACHE = os.environ.get("DOWNWARD_REVISION_CACHE") # path to revision cache
 ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch")
 
-# ipc 11-23, duplicates removed
 SUITE = [
-  "agricola-sat18-strips",
   "barman-sat14-strips",
-  "caldera-sat18-adl",
-  "caldera-split-sat18-adl",
-  "cavediving-14-adl",
-  "childsnack-sat14-strips",
-  "citycar-sat14-adl",
-  "data-network-sat18-strips",
+  # "childsnack-sat14-strips", # consistently 0/20
   "elevators-sat11-strips",
-  "flashfill-sat18-adl",
-  "floortile-sat14-strips",
-  "folding-sat23-adl",
-  "ged-sat14-strips",
-  "hiking-sat14-strips",
-  "labyrinth-sat23-adl",
-  "maintenance-sat14-adl",
+  "floortile-sat11-strips",
+  # "ged-sat14-strips", # consistently about 18/20
+  # "hiking-sat14-strips", # consistently about 20/20
   "nomystery-sat11-strips",
-  "nurikabe-sat18-adl",
   "openstacks-sat14-strips",
-  "organic-synthesis-sat18-strips",
-  "organic-synthesis-split-sat18-strips",
-  "parcprinter-sat11-strips",
-  "parking-sat14-strips",
-  "pegsol-sat11-strips",
-  "quantum-layout-sat23-strips",
-  "recharging-robots-sat23-adl",
-  "ricochet-robots-sat23-adl",
-  "rubiks-cube-sat23-adl",
-  "scanalyzer-sat11-strips",
-  "settlers-sat18-adl",
-  "slitherlink-sat23-adl",
-  "snake-sat18-strips",
-  "sokoban-sat11-strips",
-  "spider-sat18-strips",
-  "termes-sat18-strips",
+  # "parcprinter-sat11-strips", # consistently about 20/20
+  "parking-sat11-strips",
+  # "pegsol-sat11-strips", # consistently about 20/20
+  # "scanalyzer-sat11-strips", # consistently about 19/20
+  # "sokoban-sat11-strips", # consistently about 19/20
   "tetris-sat14-strips",
   "thoughtful-sat14-strips",
   "tidybot-sat11-strips",
-  "transport-sat14-strips",
+  "transport-sat11-strips",
   "visitall-sat14-strips",
   "woodworking-sat11-strips",
 ]
@@ -88,40 +65,40 @@ def epscfg(ts, bs, bt, ss, st, seed, epsilon):
   return (f'{ts}{epsilon_}-{bs.upper()}{bt_}-{ss.lower()}{st_}-{seed}', ['--search', epsex(ts, evals, bs.upper(), bt, ss.upper(), st, seed, epsilon)])
 
 CONFIGS = [
-  ('gbfs', ['--search', f'eager(single({H_EXPR}), cost_type={COST_TYPE})']),
+  # ('gbfs', ['--search', f'eager(single({H_EXPR}), cost_type={COST_TYPE})']),
 ]
 for bt in [1]:
   for st in [1]:
-    for seed in [5, 6, 7, 8 ,9]:
-      CONFIGS.append(onecfg('hg', 'U', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hg', 'H', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'U', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'U', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('hi', 'H', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'H', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('hi', 'D', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'D', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('lw', 'U', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('lw', 'U', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('lw', 'H', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('lw', 'H', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('lw', 'D', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('lw', 'D', bt, 'h', st, seed))
-      # for epsilon in [0.1, 0.25, 0.5, 0.75]:
-      #   CONFIGS.append(epscfg('hg', 'U', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hg', 'H', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hi', 'U', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hi', 'U', bt, 'h', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hi', 'H', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hi', 'H', bt, 'h', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hi', 'D', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('hi', 'D', bt, 'h', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('lw', 'U', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('lw', 'U', bt, 'h', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('lw', 'H', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('lw', 'H', bt, 'h', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('lw', 'D', bt, 'u', st, seed, epsilon))
-      #   CONFIGS.append(epscfg('lw', 'D', bt, 'h', st, seed, epsilon))
+    for seed in [0, 1, 2, 3, 4]:
+      # CONFIGS.append(onecfg('hg', 'U', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hg', 'H', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'U', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'U', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('hi', 'H', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'H', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('hi', 'D', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'D', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('lw', 'U', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('lw', 'U', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('lw', 'H', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('lw', 'H', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('lw', 'D', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('lw', 'D', bt, 'h', st, seed))
+      for epsilon in [0.1, 0.25, 0.5, 0.75]:
+        CONFIGS.append(epscfg('hg', 'U', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hg', 'H', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'U', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'U', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'H', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'H', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'D', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'D', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'U', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'U', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'H', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'H', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'D', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'D', bt, 'h', st, seed, epsilon))
 
 BUILD_OPTIONS = []
 DRIVER_OPTIONS = [

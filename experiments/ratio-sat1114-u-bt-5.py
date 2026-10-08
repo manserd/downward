@@ -13,7 +13,25 @@ REVISION_CACHE = os.environ.get("DOWNWARD_REVISION_CACHE") # path to revision ca
 ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch")
 
 SUITE = [
-  "hiking-sat14-strips",
+  "barman-sat14-strips",
+    # "childsnack-sat14-strips", # consistently 0/20
+    "elevators-sat11-strips",
+    "floortile-sat11-strips",
+    # "ged-sat14-strips", # consistently about 18/20
+    # "hiking-sat14-strips", # consistently about 20/20
+    "nomystery-sat11-strips",
+    "openstacks-sat14-strips",
+    # "parcprinter-sat11-strips", # consistently about 20/20
+    "parking-sat11-strips",
+    # "pegsol-sat11-strips", # consistently about 20/20
+    # "scanalyzer-sat11-strips", # consistently about 19/20
+    # "sokoban-sat11-strips", # consistently about 19/20
+    "tetris-sat14-strips",
+    "thoughtful-sat14-strips",
+    "tidybot-sat11-strips",
+    "transport-sat11-strips",
+    "visitall-sat14-strips",
+    "woodworking-sat11-strips",
 ]
 
 COST_TYPE = 'one'
@@ -49,31 +67,31 @@ def epscfg(ts, bs, bt, ss, st, seed, epsilon):
 CONFIGS = [
   # ('gbfs', ['--search', f'eager(single({H_EXPR}), cost_type={COST_TYPE})']),
 ]
-for bt in [1]:
+for bt in [0.25, 0.5, 2, 5, 10]:
   for st in [1]:
-    for seed in [5, 6, 7, 8 ,9]:
+    for seed in [0, 1, 2, 3, 4]:
       # CONFIGS.append(onecfg('hg', 'U', bt, 'u', st, seed))
-      # CONFIGS.append(onecfg('hg', 'H', bt, 'u', st, seed))
+      CONFIGS.append(onecfg('hg', 'H', bt, 'u', st, seed))
       # CONFIGS.append(onecfg('hi', 'U', bt, 'u', st, seed))
       # CONFIGS.append(onecfg('hi', 'U', bt, 'h', st, seed))
-      # CONFIGS.append(onecfg('hi', 'H', bt, 'u', st, seed))
-      # CONFIGS.append(onecfg('hi', 'H', bt, 'h', st, seed))
-      # CONFIGS.append(onecfg('hi', 'D', bt, 'u', st, seed))
-      # CONFIGS.append(onecfg('hi', 'D', bt, 'h', st, seed))
+      CONFIGS.append(onecfg('hi', 'H', bt, 'u', st, seed))
+      CONFIGS.append(onecfg('hi', 'H', bt, 'h', st, seed))
+      CONFIGS.append(onecfg('hi', 'D', bt, 'u', st, seed))
+      CONFIGS.append(onecfg('hi', 'D', bt, 'h', st, seed))
       # CONFIGS.append(onecfg('lw', 'U', bt, 'u', st, seed))
       # CONFIGS.append(onecfg('lw', 'U', bt, 'h', st, seed))
-      # CONFIGS.append(onecfg('lw', 'H', bt, 'u', st, seed))
-      # CONFIGS.append(onecfg('lw', 'H', bt, 'h', st, seed))
-      # CONFIGS.append(onecfg('lw', 'D', bt, 'u', st, seed))
-      # CONFIGS.append(onecfg('lw', 'D', bt, 'h', st, seed))
-      for epsilon in [0.2, 0.5]:
+      CONFIGS.append(onecfg('lw', 'H', bt, 'u', st, seed))
+      CONFIGS.append(onecfg('lw', 'H', bt, 'h', st, seed))
+      CONFIGS.append(onecfg('lw', 'D', bt, 'u', st, seed))
+      CONFIGS.append(onecfg('lw', 'D', bt, 'h', st, seed))
+      # for epsilon in [0.1, 0.25, 0.5, 0.75]:
       #   CONFIGS.append(epscfg('hg', 'U', bt, 'u', st, seed, epsilon))
       #   CONFIGS.append(epscfg('hg', 'H', bt, 'u', st, seed, epsilon))
       #   CONFIGS.append(epscfg('hi', 'U', bt, 'u', st, seed, epsilon))
       #   CONFIGS.append(epscfg('hi', 'U', bt, 'h', st, seed, epsilon))
       #   CONFIGS.append(epscfg('hi', 'H', bt, 'u', st, seed, epsilon))
       #   CONFIGS.append(epscfg('hi', 'H', bt, 'h', st, seed, epsilon))
-        CONFIGS.append(epscfg('hi', 'D', bt, 'u', st, seed, epsilon))
+      #   CONFIGS.append(epscfg('hi', 'D', bt, 'u', st, seed, epsilon))
       #   CONFIGS.append(epscfg('hi', 'D', bt, 'h', st, seed, epsilon))
       #   CONFIGS.append(epscfg('lw', 'U', bt, 'u', st, seed, epsilon))
       #   CONFIGS.append(epscfg('lw', 'U', bt, 'h', st, seed, epsilon))

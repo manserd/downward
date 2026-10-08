@@ -12,6 +12,9 @@ template<class Entry> class EpsOpenList : public OpenList<Entry>
 {
     const std::unique_ptr<OpenList<Entry>> main;
     const std::unique_ptr<OpenList<Entry>> alt;
+    bool prev_was_main = false;
+    int main_wins = 0;
+    int alt_wins = 0;
     const double epsilon;
     RNG rng;
 
@@ -41,10 +44,29 @@ public:
         alt->notify_new_expansion(parent_entry);
     }
 
+    void notify_prev_was_closed() override
+    {
+        if (prev_was_main) {
+            --main_wins;
+        } else {
+            --alt_wins;
+        }
+    }
+
+    void print_statistics(utils::LogProxy& log) override
+    {
+        log << "Exploration ratio: " << static_cast<double>(alt_wins) / main_wins << std::endl;
+    }
+
     Entry remove_min() override
     {
-        if ((rng->random() < epsilon && !alt->empty()) || main->empty())
+        if ((rng->random() < epsilon && !alt->empty()) || main->empty()) {
+            prev_was_main = false;
+            ++alt_wins;
             return alt->remove_min();
+        }
+        prev_was_main = true;
+        ++main_wins;
         return main->remove_min();
     }
 

@@ -2,9 +2,8 @@
 
 import os
 
+import custom_parser
 import project
-
-import experiments.old.custom_parser as custom_parser
 
 REPO = project.get_repo_base() # path to downward repo
 BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"] # path to benchmarks

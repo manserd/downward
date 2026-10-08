@@ -105,7 +105,7 @@ ATTRIBUTES = [
   "memory",
   "cost",
   "plan_length",
-  "exploration_ratio",
+  project.EXPLORATION_RATIO,
   project.EVALUATIONS_PER_TIME,
 ]
 

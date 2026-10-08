@@ -5,18 +5,16 @@ import sys
 from collections import defaultdict
 from pathlib import Path
 
+from lab import tools
+from lab.environments import (BaselSlurmEnvironment, LocalEnvironment,
+                              TetralithEnvironment)
+from lab.experiment import ARGPARSER
+from lab.reports import Attribute, arithmetic_mean, geometric_mean
+
 from downward.experiment import FastDownwardExperiment
 from downward.reports.absolute import AbsoluteReport
 from downward.reports.scatter import ScatterPlotReport
 from downward.reports.taskwise import TaskwiseReport
-from lab import tools
-from lab.environments import (
-    BaselSlurmEnvironment,
-    LocalEnvironment,
-    TetralithEnvironment,
-)
-from lab.experiment import ARGPARSER
-from lab.reports import Attribute, geometric_mean
 
 # Silence import-unused messages. Experiment scripts may use these imports.
 assert (
@@ -49,6 +47,9 @@ ARGS = parse_args()
 TEX = ARGS.tex
 RELATIVE = ARGS.relative
 
+EXPLORATION_RATIO = Attribute(
+    "exploration_ratio", absolute=True, function=arithmetic_mean
+)
 EVALUATIONS_PER_TIME = Attribute(
     "evaluations_per_time", min_wins=False, function=geometric_mean, digits=1
 )

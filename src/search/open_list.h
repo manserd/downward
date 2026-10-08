@@ -5,6 +5,7 @@
 
 #include "evaluation_context.h"
 #include "operator_id.h"
+#include "utils/logging.h"
 
 class StateID;
 
@@ -125,6 +126,8 @@ public:
         EvaluationContext &eval_context) const = 0;
 
     virtual void notify_new_expansion(const Entry &/*parent_entry*/) {}
+    virtual void print_statistics(utils::LogProxy& /*log*/) {}
+    virtual void notify_prev_was_closed() {}
 };
 
 

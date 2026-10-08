@@ -119,6 +119,7 @@ void EagerSearch::print_statistics() const {
     statistics.print_detailed_statistics();
     search_space.print_statistics();
     pruning_method->print_statistics();
+    open_list->print_statistics(log);
 }
 
 SearchStatus EagerSearch::step() {
@@ -134,6 +135,7 @@ SearchStatus EagerSearch::step() {
         outl("pop " << id << " g=" << node->get_g());
 
         if (node->is_closed()) {
+            open_list->notify_prev_was_closed();
             outl("closed, next");
             continue;
         }

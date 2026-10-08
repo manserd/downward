@@ -5,6 +5,7 @@
 #include "../plugins/plugin.h"
 #include "../utils/memory.h"
 #include "../utils/system.h"
+#include "../utils/logging.h"
 
 #include <cassert>
 #include <memory>
@@ -18,6 +19,8 @@ template<class Entry>
 class AlternationOpenList : public OpenList<Entry> {
     vector<unique_ptr<OpenList<Entry>>> open_lists;
     vector<int> priorities;
+    vector<int> wins;
+    int prev_best;
 
     const int boost_amount;
 protected:
@@ -39,6 +42,8 @@ public:
     virtual bool is_reliable_dead_end(
         EvaluationContext &eval_context) const override;
     void notify_new_expansion(const Entry& parent_entry) override;
+    void print_statistics(utils::LogProxy& log) override;
+    void notify_prev_was_closed() override;
 };
 
 
@@ -52,6 +57,7 @@ AlternationOpenList<Entry>::AlternationOpenList(
         open_lists.push_back(factory->create_open_list<Entry>());
 
     priorities.resize(open_lists.size(), 0);
+    wins.resize(open_lists.size(), 0);
 }
 
 template<class Entry>
@@ -74,6 +80,8 @@ Entry AlternationOpenList<Entry>::remove_min() {
     const auto &best_list = open_lists[best];
     assert(!best_list->empty());
     ++priorities[best];
+    ++wins[best];
+    prev_best = best;
     return best_list->remove_min();
 }
 
@@ -135,6 +143,17 @@ void AlternationOpenList<Entry>::notify_new_expansion(const Entry& parent_entry)
     }
 }
 
+template<class Entry>
+void AlternationOpenList<Entry>::print_statistics(utils::LogProxy &log)
+{
+    log << "Exploration ratio: " << static_cast<double>(wins[1]) / wins[0] << endl;
+}
+
+template <class Entry>
+void AlternationOpenList<Entry>::notify_prev_was_closed()
+{
+    --wins[prev_best];
+}
 
 AlternationOpenListFactory::AlternationOpenListFactory(
     const vector<shared_ptr<OpenListFactory>> &sublists, int boost)

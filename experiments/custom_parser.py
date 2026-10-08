@@ -52,4 +52,9 @@ def get_parser():
         r"New best heuristic value for .+: (\d+)\n",
         type=int,
     )
+    parser.add_pattern(
+        "exploration_ratio",
+        r"Exploration ratio: (.+)\n",
+        type=float,
+    )
     return parser

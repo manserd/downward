@@ -90,7 +90,7 @@ DRIVER_OPTIONS = [
 
 # repo revision axis
 REV_NICKS = [
-  ("ratio", ""),
+  ("epsratio", ""),
 ]
 
 ATTRIBUTES = [

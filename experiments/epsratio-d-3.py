@@ -10,7 +10,7 @@ BENCHMARKS_DIR = os.environ["DOWNWARD_BENCHMARKS"] # path to benchmarks
 SCP_LOGIN = "myname@myserver.com"
 REMOTE_REPOS_DIR = "/infai/username/projects"
 REVISION_CACHE = os.environ.get("DOWNWARD_REVISION_CACHE") # path to revision cache
-ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch", partition="infai_2")
+ENV = project.BaselSlurmEnvironment(email="my.name@myhost.ch", partition="infai_3")
 
 # tomasz
 SUITE_REFERENCE = [
@@ -143,37 +143,37 @@ for bt in [1]:
   # for st in [0.25, 0.5, 2, 5, 10]:
     for seed in [0, 1, 2, 3, 4]:
       # 14:
-      CONFIGS.append(onecfg('hg', 'U', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hg', 'H', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'U', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'U', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('hi', 'H', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'H', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('hi', 'D', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('hi', 'D', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('lw', 'U', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('lw', 'U', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('lw', 'H', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('lw', 'H', bt, 'h', st, seed))
-      CONFIGS.append(onecfg('lw', 'D', bt, 'u', st, seed))
-      CONFIGS.append(onecfg('lw', 'D', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('hg', 'U', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hg', 'H', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'U', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'U', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('hi', 'H', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'H', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('hi', 'D', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('hi', 'D', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('lw', 'U', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('lw', 'U', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('lw', 'H', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('lw', 'H', bt, 'h', st, seed))
+      # CONFIGS.append(onecfg('lw', 'D', bt, 'u', st, seed))
+      # CONFIGS.append(onecfg('lw', 'D', bt, 'h', st, seed))
       # for epsilon in [0.5]:
-      # for epsilon in [0.1, 0.25, 0.5, 0.75]:
+      for epsilon in [0.1, 0.25, 0.5, 0.75]:
         # 14:
-        # CONFIGS.append(epscfg('hg', 'U', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hg', 'H', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hi', 'U', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hi', 'U', bt, 'h', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hi', 'H', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hi', 'H', bt, 'h', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hi', 'D', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('hi', 'D', bt, 'h', st, seed, epsilon))
-        # CONFIGS.append(epscfg('lw', 'U', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('lw', 'U', bt, 'h', st, seed, epsilon))
-        # CONFIGS.append(epscfg('lw', 'H', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('lw', 'H', bt, 'h', st, seed, epsilon))
-        # CONFIGS.append(epscfg('lw', 'D', bt, 'u', st, seed, epsilon))
-        # CONFIGS.append(epscfg('lw', 'D', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('hg', 'U', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hg', 'H', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'U', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'U', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'H', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'H', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'D', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('hi', 'D', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'U', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'U', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'H', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'H', bt, 'h', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'D', bt, 'u', st, seed, epsilon))
+        CONFIGS.append(epscfg('lw', 'D', bt, 'h', st, seed, epsilon))
 
 BUILD_OPTIONS = []
 DRIVER_OPTIONS = [
